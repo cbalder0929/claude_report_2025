@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charles Balderas — 2025 Financial Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --ink:        #0a0a0a;
+    --paper:      #f4f1ea;
+    --paper-2:    #ebe6db;
+    --rule:       #1a1a1a;
+    --accent:     #c4361b;   /* a deep editorial red */
+    --accent-2:   #e8a838;   /* mustard */
+    --green:      #1f5d3b;   /* deep forest, used for income */
+    --muted:      #5b554a;
+    --hairline:   rgba(10,10,10,0.12);
+
+    /* Category color palettes (editorial, not garish) */
+    --c1:#1f5d3b; --c2:#c4361b; --c3:#e8a838; --c4:#385a8a; --c5:#7a4b2a;
+    --c6:#5a3a6e; --c7:#0a0a0a; --c8:#8a8676; --c9:#9a2042; --c10:#2d6e7e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter Tight', sans-serif;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Subtle paper texture */
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      radial-gradient(circle at 30% 20%, rgba(0,0,0,0.025) 0, transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(0,0,0,0.02) 0, transparent 50%);
+  }
+
+  .page { max-width: 1280px; margin: 0 auto; padding: 56px 48px 96px; position:relative; z-index:1; }
+
+  /* ============ Masthead ============ */
+  .masthead {
+    border-top: 4px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 24px 0 18px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    gap: 24px;
+  }
+  .masthead .left, .masthead .right {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .masthead .right { text-align: right; }
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    text-align: center;
+    font-variation-settings: "opsz" 144;
+  }
+  .masthead h1 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+  .sub-deck {
+    text-align: center;
+    margin-top: 8px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  /* ============ Top KPIs ============ */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 40px;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .kpi {
+    padding: 28px 24px;
+    border-right: 1px solid var(--hairline);
+  }
+  .kpi:last-child { border-right: none; }
+  .kpi .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .kpi .value {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 38px;
+    margin-top: 10px;
+    letter-spacing: -0.02em;
+    font-variation-settings: "opsz" 144;
+  }
+  .kpi.green .value { color: var(--green); }
+  .kpi.red   .value { color: var(--accent); }
+  .kpi.net   .value { color: var(--ink); }
+  .kpi .sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ============ Section ============ */
+  section { margin-top: 72px; }
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 16px;
+    margin-bottom: 32px;
+    font-variation-settings: "opsz" 144;
+  }
+  .section-title em { font-style: italic; font-weight: 400; color: var(--accent); }
+
+  /* ============ Two-column grid for chart + table ============ */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 5fr 6fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .grid-2.flip { grid-template-columns: 6fr 5fr; }
+
+  .chart-wrap {
+    background: var(--paper-2);
+    border: 1px solid var(--ink);
+    padding: 24px;
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+  .chart-wrap h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+  .chart-host { position: relative; height: 380px; }
+  .chart-host.tall { height: 460px; }
+
+  /* ============ Tables ============ */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14px;
+  }
+  th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    padding: 10px 8px;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td {
+    padding: 12px 8px;
+    border-bottom: 1px dotted var(--hairline);
+  }
+  tr:hover td { background: rgba(196, 54, 27, 0.04); }
+  td .swatch {
+    display: inline-block;
+    width: 10px; height: 10px;
+    margin-right: 10px;
+    border-radius: 2px;
+    vertical-align: middle;
+  }
+  td.cat { font-weight: 500; }
+  td.amt { font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  td.pct { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  tr.total td {
+    border-top: 1.5px solid var(--ink);
+    border-bottom: 3px double var(--ink);
+    font-weight: 700;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+  }
+  tr.total td.amt { font-family: 'JetBrains Mono', monospace; }
+
+  /* ============ Monthly section ============ */
+  .monthly-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    border: 1px solid var(--ink);
+    background: var(--paper-2);
+  }
+  .month-cell {
+    padding: 16px 14px;
+    border-right: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .month-cell:nth-child(6n) { border-right: none; }
+  .month-cell:nth-last-child(-n+6) { border-bottom: none; }
+  .month-cell .m {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .month-cell .val {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 22px;
+    margin-top: 6px;
+    letter-spacing: -0.02em;
+  }
+  .month-cell.pos .val { color: var(--green); }
+  .month-cell.neg .val { color: var(--accent); }
+  .month-cell .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ============ Footer ============ */
+  footer {
+    margin-top: 96px;
+    padding-top: 24px;
+    border-top: 4px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+
+  /* Annotation pull-quote */
+  .pull {
+    margin: 16px 0 24px;
+    padding: 20px 28px;
+    border-left: 4px solid var(--accent);
+    background: var(--paper-2);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .pull strong { font-style: normal; font-weight: 700; color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page { padding: 32px 20px; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .kpi { border-bottom: 1px solid var(--hairline); }
+    .grid-2, .grid-2.flip { grid-template-columns: 1fr; }
+    .monthly-grid { grid-template-columns: repeat(3, 1fr); }
+    .month-cell { border-right: 1px solid var(--hairline) !important; }
+    .month-cell:nth-child(3n) { border-right: none !important; }
+    .section-title { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <div class="left">
+      Vol. I &nbsp;·&nbsp; No. 1<br>
+      Issued: May 03, 2026
+    </div>
+    <h1>The Year in <em>Numbers</em></h1>
+    <div class="right">
+      Charles M. Balderas<br>
+      A 2025 Financial Review
+    </div>
+  </header>
+  <div class="sub-deck">A complete picture of the year's earnings and expenditures, drawn from twelve months of bank statements, two credit cards, and every transaction in between.</div>
+
+  <!-- ============ KPIs ============ -->
+  <div class="kpis">
+    <div class="kpi green">
+      <div class="label">↑ Total Income</div>
+      <div class="value">$26,645.66</div>
+      <div class="sub">across 9 sources</div>
+    </div>
+    <div class="kpi red">
+      <div class="label">↓ Total Expense</div>
+      <div class="value">$18,965.15</div>
+      <div class="sub">across 19 categories</div>
+    </div>
+    <div class="kpi net">
+      <div class="label">= Net Cash Flow</div>
+      <div class="value">+$7,680.51</div>
+      <div class="sub">surplus for the year</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Avg Monthly Spend</div>
+      <div class="value">$1,580</div>
+      <div class="sub">≈ $52 per day</div>
+    </div>
+  </div>
+
+  <!-- ============ INCOME SECTION ============ -->
+  <section>
+    <div class="section-tag">Part I · Inflows</div>
+    <h2 class="section-title">Where the <em>money came from</em></h2>
+
+    <div class="pull">
+      Wages from <strong>Comcast/Xfinity</strong> were the dominant source at <strong>51% of the year's income</strong>, but the picture is far more diversified than a single paycheck — six employer/contract sources contributed, plus school refunds, family transfers, and a tax refund.
+    </div>
+
+    <div class="grid-2">
+      <div class="chart-wrap">
+        <h3>Income mix, 2025</h3>
+        <div class="chart-host"><canvas id="incomePie"></canvas></div>
+      </div>
+
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th class="num">Amount</th>
+              <th class="num">Share</th>
+            </tr>
+          </thead>
+          <tbody id="incomeTable"></tbody>
+          <tfoot>
+            <tr class="total">
+              <td>Total income</td>
+              <td class="amt">$26,645.66</td>
+              <td class="pct">100.0%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXPENSE SECTION ============ -->
+  <section>
+    <div class="section-tag">Part II · Outflows</div>
+    <h2 class="section-title">Where the <em>money went</em></h2>
+
+    <div class="pull">
+      <strong>Rent</strong> alone consumed roughly one in every four dollars spent ($4,800). Add up everything food-related — groceries, dining out, fast food, alcohol — and food was nearly $3,600. Day-to-day life: gas, transit, and small purchases at gas stations make a long, quiet tail.
+    </div>
+
+    <div class="grid-2 flip">
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th class="num">Amount</th>
+              <th class="num">Share</th>
+            </tr>
+          </thead>
+          <tbody id="expenseTable"></tbody>
+          <tfoot>
+            <tr class="total">
+              <td>Total expenses</td>
+              <td class="amt">$18,965.15</td>
+              <td class="pct">100.0%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="chart-wrap">
+        <h3>Expense mix, 2025</h3>
+        <div class="chart-host tall"><canvas id="expensePie"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MONTHLY ============ -->
+  <section>
+    <div class="section-tag">Part III · The shape of the year</div>
+    <h2 class="section-title">Month <em>by</em> month</h2>
+
+    <div class="chart-wrap" style="margin-bottom:32px;">
+      <h3>Income vs. expenses, by month</h3>
+      <div class="chart-host tall"><canvas id="monthlyBar"></canvas></div>
+    </div>
+
+    <div class="pull">
+      The strongest month was <strong>October ($+5,233 net)</strong>, lifted by a $2,081 Columbia College refund landing alongside two full Comcast paychecks. The roughest stretch was <strong>March ($–2,057 net)</strong>, when a $1,883 Best Buy purchase swallowed the month's surplus.
+    </div>
+
+    <div class="monthly-grid" id="monthlyGrid"></div>
+  </section>
+
+  <!-- ============ BY ACCOUNT ============ -->
+  <section>
+    <div class="section-tag">Part IV · By account</div>
+    <h2 class="section-title">Spending <em>by</em> source</h2>
+
+    <div class="grid-2">
+      <div class="chart-wrap">
+        <h3>Where each dollar was spent from</h3>
+        <div class="chart-host"><canvas id="sourceBar"></canvas></div>
+      </div>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th class="num">Money in</th>
+              <th class="num">Money out</th>
+            </tr>
+          </thead>
+          <tbody id="sourceTable"></tbody>
+        </table>
+        <div style="margin-top:24px; font-size:13px; color:var(--muted); font-family:'Fraunces',serif; font-style:italic; line-height:1.6;">
+          Note: To avoid double-counting, credit-card payments from BofA Checking are excluded — the underlying card purchases are already counted on Discover and the BofA Visa.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>Charles M. Balderas · 2025 Annual Financial Review</div>
+    <div>Generated May 03, 2026 · 856 transactions reviewed</div>
+  </footer>
+</div>
+
+<script>
+// =================== DATA ===================
+const incomeCats = [
+  ["Comcast/Xfinity (Wages)",          13654.26],
+  ["School Refund (Columbia College)",  3065.00],
+  ["Family Transfers (Luz Martinez)",   2580.00],
+  ["Seatinez Tax Service (Contract)",   2550.00],
+  ["VPC Prudential (Wages)",            2306.13],
+  ["Bridgeport Gym (Wages)",            1861.99],
+  ["Refunds / Credits",                  460.73],
+  ["Tax Refund",                         153.07],
+  ["Settlement / Other",                  14.48],
+];
+
+const expenseCats = [
+  ["Rent",                          4800.00],
+  ["Retail / Shopping",             2684.91],
+  ["Groceries",                     2047.54],
+  ["Dining / Restaurants",          1525.21],
+  ["Amazon / Online Shopping",      1098.28],
+  ["Gas / Fuel",                    1087.71],
+  ["Personal Transfers (Zelle Out)",1084.00],
+  ["Transportation / Rideshare",    1022.49],
+  ["Other / Misc",                   918.45],
+  ["Health / Pharmacy",              590.09],
+  ["ATM / Cash Withdrawals",         539.44],
+  ["Subscriptions",                  452.35],
+  ["Fees & Adjustments",             325.00],
+  ["Phone / Internet",               308.75],
+  ["Education / Books",              259.93],
+  ["Pets / Charity",                 130.00],
+  ["Alcohol / Liquor",                45.17],
+  ["Digital Goods / Subscriptions",   44.08],
+  ["Vending / Workplace Snacks",       1.75],
+];
+
+const monthly = {
+  "2025-01": {income:2225.87, expense:1053.87, net:1172.00},
+  "2025-02": {income:3238.37, expense:1701.21, net:1537.16},
+  "2025-03": {income:1666.26, expense:3723.28, net:-2057.02},
+  "2025-04": {income: 600.00, expense:1030.61, net:-430.61},
+  "2025-05": {income: 169.99, expense: 955.56, net:-785.57},
+  "2025-06": {income: 423.55, expense: 960.26, net:-536.71},
+  "2025-07": {income:2624.43, expense:1663.87, net:960.56},
+  "2025-08": {income:2812.69, expense:1129.82, net:1682.87},
+  "2025-09": {income:2599.86, expense:2161.67, net:438.19},
+  "2025-10": {income:6706.77, expense:1474.12, net:5232.65},
+  "2025-11": {income:2488.41, expense: 739.61, net:1748.80},
+  "2025-12": {income:1089.46, expense:2371.27, net:-1281.81},
+};
+
+const bySource = {
+  "BofA Checking":     {income: 26184.93, expense: 9153.20},
+  "Discover Card":     {income:   460.73, expense: 8560.84},
+  "AmEx (BofA Visa)":  {income:     0.00, expense: 1251.11},
+};
+
+const TOTAL_INCOME  = 26645.66;
+const TOTAL_EXPENSE = 18965.15;
+
+// Editorial palette (warm/earthy/distinctive — no purple gradients)
+const PALETTE = [
+  "#1f5d3b", // forest
+  "#c4361b", // editorial red
+  "#e8a838", // mustard
+  "#385a8a", // ink blue
+  "#7a4b2a", // espresso
+  "#5a3a6e", // plum (used sparingly)
+  "#0a0a0a", // ink
+  "#8a8676", // stone
+  "#9a2042", // burgundy
+  "#2d6e7e", // teal
+  "#b86b3a", // terracotta
+  "#4d6b3c", // moss
+  "#6e3a3a", // brick
+  "#3d4a5c", // slate
+  "#a8804a", // bronze
+  "#d97a4a", // persimmon
+  "#5e7a52", // sage-deep
+  "#7d5a8c", // muted plum
+  "#444",    // graphite
+];
+
+// =================== CHART DEFAULTS ===================
+Chart.defaults.font.family = "'Inter Tight', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = "#0a0a0a";
+
+const fmtMoney = (v) => "$" + v.toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtMoneyShort = (v) => v >= 1000 ? "$"+(v/1000).toFixed(1)+"k" : "$"+v.toFixed(0);
+
+// =================== INCOME PIE ===================
+new Chart(document.getElementById("incomePie"), {
+  type: "doughnut",
+  data: {
+    labels: incomeCats.map(c => c[0]),
+    datasets: [{
+      data: incomeCats.map(c => c[1]),
+      backgroundColor: PALETTE.slice(0, incomeCats.length),
+      borderColor: "#f4f1ea",
+      borderWidth: 2,
+      hoverOffset: 8,
+    }],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: "55%",
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: { boxWidth:10, boxHeight:10, padding:10, font:{size:11} },
+      },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const v = ctx.parsed;
+            const pct = (v/TOTAL_INCOME*100).toFixed(1);
+            return ` ${ctx.label}: ${fmtMoney(v)} (${pct}%)`;
+          }
+        }
+      }
+    }
+  }
+});
+
+// =================== EXPENSE PIE ===================
+new Chart(document.getElementById("expensePie"), {
+  type: "doughnut",
+  data: {
+    labels: expenseCats.map(c => c[0]),
+    datasets: [{
+      data: expenseCats.map(c => c[1]),
+      backgroundColor: PALETTE.slice(0, expenseCats.length),
+      borderColor: "#f4f1ea",
+      borderWidth: 2,
+      hoverOffset: 8,
+    }],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: "50%",
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: { boxWidth:10, boxHeight:10, padding:8, font:{size:10} },
+      },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const v = ctx.parsed;
+            const pct = (v/TOTAL_EXPENSE*100).toFixed(1);
+            return ` ${ctx.label}: ${fmtMoney(v)} (${pct}%)`;
+          }
+        }
+      }
+    }
+  }
+});
+
+// =================== INCOME TABLE ===================
+const incomeTbody = document.getElementById("incomeTable");
+incomeCats.forEach((c, i) => {
+  const pct = (c[1]/TOTAL_INCOME*100).toFixed(1);
+  incomeTbody.insertAdjacentHTML("beforeend", `
+    <tr>
+      <td class="cat"><span class="swatch" style="background:${PALETTE[i]}"></span>${c[0]}</td>
+      <td class="amt num">${fmtMoney(c[1])}</td>
+      <td class="pct num">${pct}%</td>
+    </tr>`);
+});
+
+// =================== EXPENSE TABLE ===================
+const expenseTbody = document.getElementById("expenseTable");
+expenseCats.forEach((c, i) => {
+  const pct = (c[1]/TOTAL_EXPENSE*100).toFixed(1);
+  expenseTbody.insertAdjacentHTML("beforeend", `
+    <tr>
+      <td class="cat"><span class="swatch" style="background:${PALETTE[i]}"></span>${c[0]}</td>
+      <td class="amt num">${fmtMoney(c[1])}</td>
+      <td class="pct num">${pct}%</td>
+    </tr>`);
+});
+
+// =================== MONTHLY BAR ===================
+const months = Object.keys(monthly);
+const monthLabels = months.map(m => {
+  const [y,mm] = m.split("-");
+  return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][parseInt(mm)-1];
+});
+
+new Chart(document.getElementById("monthlyBar"), {
+  type: "bar",
+  data: {
+    labels: monthLabels,
+    datasets: [
+      {
+        label: "Income",
+        data: months.map(m => monthly[m].income),
+        backgroundColor: "#1f5d3b",
+        borderRadius: 0,
+      },
+      {
+        label: "Expenses",
+        data: months.map(m => monthly[m].expense),
+        backgroundColor: "#c4361b",
+        borderRadius: 0,
+      },
+      {
+        label: "Net",
+        data: months.map(m => monthly[m].net),
+        type: "line",
+        borderColor: "#0a0a0a",
+        backgroundColor: "#0a0a0a",
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        pointBackgroundColor: "#f4f1ea",
+        pointBorderWidth: 2,
+        tension: 0.25,
+        fill: false,
+      },
+    ],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top", align: "end",
+        labels: { boxWidth:12, boxHeight:12, padding:14, font:{size:12, weight:500} }
+      },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` ${ctx.dataset.label}: ${fmtMoney(ctx.parsed.y)}`,
+        }
+      }
+    },
+    scales: {
+      y: {
+        grid: { color: "rgba(10,10,10,0.08)" },
+        ticks: { callback: (v) => fmtMoneyShort(v), font:{size:11} },
+      },
+      x: {
+        grid: { display:false },
+        ticks: { font:{size:11, weight:500} },
+      },
+    },
+  }
+});
+
+// =================== MONTHLY GRID ===================
+const grid = document.getElementById("monthlyGrid");
+months.forEach((m,i) => {
+  const data = monthly[m];
+  const pos = data.net >= 0;
+  const cls = pos ? "pos" : "neg";
+  const sign = pos ? "+" : "−";
+  grid.insertAdjacentHTML("beforeend", `
+    <div class="month-cell ${cls}">
+      <div class="m">${monthLabels[i]} '25</div>
+      <div class="val">${sign}${fmtMoney(Math.abs(data.net)).replace("$","$")}</div>
+      <div class="meta">in ${fmtMoneyShort(data.income)} · out ${fmtMoneyShort(data.expense)}</div>
+    </div>
+  `);
+});
+
+// =================== BY-SOURCE BAR ===================
+const sources = Object.keys(bySource);
+new Chart(document.getElementById("sourceBar"), {
+  type: "bar",
+  data: {
+    labels: sources,
+    datasets: [
+      {
+        label: "Income",
+        data: sources.map(s => bySource[s].income),
+        backgroundColor: "#1f5d3b",
+      },
+      {
+        label: "Expenses",
+        data: sources.map(s => bySource[s].expense),
+        backgroundColor: "#c4361b",
+      },
+    ],
+  },
+  options: {
+    indexAxis: "y",
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top", align:"end",
+        labels: { boxWidth:12, boxHeight:12, padding:12, font:{size:12} }
+      },
+      tooltip: {
+        callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${fmtMoney(ctx.parsed.x)}` }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color:"rgba(10,10,10,0.08)" },
+        ticks: { callback:(v)=>fmtMoneyShort(v) },
+      },
+      y: { grid: { display:false }, ticks:{ font:{size:12, weight:500} } },
+    },
+  },
+});
+
+// =================== SOURCE TABLE ===================
+const srcTbody = document.getElementById("sourceTable");
+sources.forEach(s => {
+  const d = bySource[s];
+  srcTbody.insertAdjacentHTML("beforeend", `
+    <tr>
+      <td class="cat">${s}</td>
+      <td class="amt num" style="color:#1f5d3b">${fmtMoney(d.income)}</td>
+      <td class="amt num" style="color:#c4361b">${fmtMoney(d.expense)}</td>
+    </tr>
+  `);
+});
+</script>
+</body>
+</html>
